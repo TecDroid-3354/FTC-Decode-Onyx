@@ -17,4 +17,5 @@ public class intake extends SubsystemBase {
     public void stopPowerIntake(double power) {
         powerIntake.set(power = 1);
     }
+
 }

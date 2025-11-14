@@ -33,6 +33,10 @@ public class OpMode extends CommandOpMode {
 
         //run until the end of the match(driver presses STOP)
         while (opModeIsActive()) {
+            driveTrain.drive(
+                    (double)gamepad1.left_stick_x,
+                    (double)gamepad1.left_stick_y,
+                    (double)gamepad1.right_stick_x);
 
             if (gamepad1.right_trigger > 0.1){
                 intake.setPowerIntake(1);
@@ -46,39 +50,8 @@ public class OpMode extends CommandOpMode {
                 shooter.stopPowerShooter(0);
             }
 
-            if (gamepad1.left_stick_y>0.1) {
-                driveTrain.setFrontRightMotor(gamepad1.left_stick_y);
-                driveTrain.setFrontLeftMotor(gamepad1.left_stick_y);
-                driveTrain.setBackRightMotor(gamepad1.left_stick_y);
-                driveTrain.setBackLeftMotor(gamepad1.left_stick_y);
-            }else if (gamepad1.left_stick_y<-0.1) {
-                driveTrain.setFrontRightMotor(gamepad1.left_stick_y);
-                driveTrain.setFrontLeftMotor(gamepad1.left_stick_y);
-                driveTrain.setBackRightMotor(gamepad1.left_stick_y);
-                driveTrain.setBackLeftMotor(gamepad1.left_stick_y);
-            }if (gamepad1.left_stick_y == 0){
-                driveTrain.setFrontRightMotor(0);
-                driveTrain.setFrontLeftMotor(0);
-                driveTrain.setBackRightMotor(0);
-                driveTrain.setBackLeftMotor(0);
-            }
 
-            if (gamepad1.left_stick_x>0.1) {
-                driveTrain.setFrontRightMotor(-gamepad1.left_stick_y);
-                driveTrain.setFrontLeftMotor(gamepad1.left_stick_y);
-                driveTrain.setBackRightMotor(gamepad1.left_stick_y);
-                driveTrain.setBackLeftMotor(-gamepad1.left_stick_y);
-            }else if (gamepad1.left_stick_x<0.1){
-                driveTrain.setFrontRightMotor(gamepad1.left_stick_y);
-                driveTrain.setFrontLeftMotor(-gamepad1.left_stick_y);
-                driveTrain.setBackRightMotor(-gamepad1.left_stick_y);
-                driveTrain.setBackLeftMotor(gamepad1.left_stick_y);
-            }if (gamepad1.left_stick_x == 0){
-                driveTrain.setFrontRightMotor(0);
-                driveTrain.setFrontLeftMotor(0);
-                driveTrain.setBackRightMotor(0);
-                driveTrain.setBackLeftMotor(0);
-            }
+
 
 
 
