@@ -1,15 +1,14 @@
-package org.firstinspires.ftc.teamcode.hood;
+package org.firstinspires.ftc.teamcode.Hood;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
-public class hood extends SubsystemBase {
+public class Hood extends SubsystemBase {
     private ServoEx servoHood;
 
 
-    public hood (HardwareMap hardwareMap) {
+    public Hood (HardwareMap hardwareMap) {
         servoHood = new ServoEx(hardwareMap, "servoHood");
         servoHood.getServo().scaleRange(0, 360);
     }

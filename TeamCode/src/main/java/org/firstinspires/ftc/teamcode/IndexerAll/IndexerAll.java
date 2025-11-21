@@ -1,21 +1,20 @@
-package org.firstinspires.ftc.teamcode.indexerAll;
+package org.firstinspires.ftc.teamcode.IndexerAll;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.indexer.indexer;
+import org.firstinspires.ftc.teamcode.Indexer.Indexer;
+import org.firstinspires.ftc.teamcode.Indexer.Indexer;
 
-public class indexerAll{
+public class IndexerAll{
 
 
     private GamepadEx gamepad1;
-    private indexer indexer;
+    private Indexer indexer;
 
     public void initialize() {
-        indexer = new indexer();
+        indexer = new Indexer();
         gamepad1 = new GamepadEx (new Gamepad());
     }
 

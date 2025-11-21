@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.centering;
+package org.firstinspires.ftc.teamcode.Centering;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
-public class centering{
+public class Centering{
 
     private ServoEx centeringRight;
     private ServoEx centeringLeft;
 
-    public centering(HardwareMap hardwareMap) {
+    public Centering(HardwareMap hardwareMap) {
         centeringRight = new ServoEx(hardwareMap, "centeringRight");
         centeringRight.getServo().scaleRange(0.3, 1);
         centeringLeft = new ServoEx(hardwareMap, "centeringLeft");

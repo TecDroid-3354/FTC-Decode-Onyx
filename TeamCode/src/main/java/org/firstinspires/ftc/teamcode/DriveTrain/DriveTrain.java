@@ -1,16 +1,15 @@
-package org.firstinspires.ftc.teamcode.driveTrain;
+package org.firstinspires.ftc.teamcode.DriveTrain;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-import java.util.function.DoubleSupplier;
-
-public class driveTrain {
+public class DriveTrain extends SubsystemBase {
 
     private Motor frontRightMotor;
     private Motor frontLeftMotor;
@@ -20,7 +19,7 @@ public class driveTrain {
     private IMU imu;
     private RevHubOrientationOnRobot revHubOrientation;
 
-   public driveTrain(HardwareMap hardwareMap) {
+   public DriveTrain(HardwareMap hardwareMap) {
        imu = hardwareMap.get(IMU.class, "imu");
        revHubOrientation = new RevHubOrientationOnRobot(
                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,

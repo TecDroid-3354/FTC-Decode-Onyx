@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.indexer;
+package org.firstinspires.ftc.teamcode.Indexer;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
-public class indexer extends SubsystemBase {
+public class Indexer extends SubsystemBase {
 
     private ServoEx startIndexerServo;
     private ServoEx leftIndexerServo;

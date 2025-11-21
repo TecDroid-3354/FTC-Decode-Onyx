@@ -1,38 +1,37 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
-import org.firstinspires.ftc.teamcode.centering.centering;
-import org.firstinspires.ftc.teamcode.driveTrain.driveTrain;
-import org.firstinspires.ftc.teamcode.hood.hood;
-import org.firstinspires.ftc.teamcode.indexerAll.indexerAll;
-import org.firstinspires.ftc.teamcode.intake.intake;
-import org.firstinspires.ftc.teamcode.shooter.shooter;
+import org.firstinspires.ftc.teamcode.DriveTrain.DriveTrain;
+import org.firstinspires.ftc.teamcode.Hood.Hood;
+import org.firstinspires.ftc.teamcode.IndexerAll.IndexerAll;
+import org.firstinspires.ftc.teamcode.Centering.Centering;
+import org.firstinspires.ftc.teamcode.Intake.Intake;
+import org.firstinspires.ftc.teamcode.Shooter.Shooter;
 
 
 @TeleOp(name ="shooter",group ="Tec droid")
 public class OpMode extends CommandOpMode {
     private GamepadEx controller;
-    private shooter shooter;
-    private intake intake;
-    private driveTrain driveTrain;
-    private centering centering;
-    private hood hood;
-    private indexerAll indexerAll;
+    private Shooter shooter;
+    private Intake intake;
+    private DriveTrain driveTrain;
+    private Centering centering;
+    private Hood hood;
+    private IndexerAll indexerAll;
 
 
 
      public void initialize () {
-        shooter = new shooter(hardwareMap);
-        intake = new intake(hardwareMap);
+        shooter = new Shooter(hardwareMap);
+        intake = new Intake(hardwareMap);
         controller = new GamepadEx(gamepad1);
-        driveTrain = new driveTrain(hardwareMap);
-        centering = new centering (hardwareMap);
-        hood = new hood (hardwareMap);
-        indexerAll = new indexerAll ();
+        driveTrain = new DriveTrain (hardwareMap);
+        centering = new Centering(hardwareMap);
+        hood = new Hood (hardwareMap);
+        indexerAll = new IndexerAll ();
     }
 @Override
     public void runOpMode() {
