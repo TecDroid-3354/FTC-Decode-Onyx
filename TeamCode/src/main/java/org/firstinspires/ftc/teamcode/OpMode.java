@@ -5,7 +5,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.centering.centering;
 import org.firstinspires.ftc.teamcode.driveTrain.driveTrain;
+import org.firstinspires.ftc.teamcode.hood.hood;
+import org.firstinspires.ftc.teamcode.indexerAll.indexerAll;
 import org.firstinspires.ftc.teamcode.intake.intake;
 import org.firstinspires.ftc.teamcode.shooter.shooter;
 
@@ -16,6 +19,9 @@ public class OpMode extends CommandOpMode {
     private shooter shooter;
     private intake intake;
     private driveTrain driveTrain;
+    private centering centering;
+    private hood hood;
+    private indexerAll indexerAll;
 
 
 
@@ -24,6 +30,9 @@ public class OpMode extends CommandOpMode {
         intake = new intake(hardwareMap);
         controller = new GamepadEx(gamepad1);
         driveTrain = new driveTrain(hardwareMap);
+        centering = new centering (hardwareMap);
+        hood = new hood (hardwareMap);
+        indexerAll = new indexerAll ();
     }
 @Override
     public void runOpMode() {
@@ -50,12 +59,25 @@ public class OpMode extends CommandOpMode {
                 shooter.stopPowerShooter(0);
             }
 
+            if (gamepad1.rightBumperWasPressed()){
+                centering.setCentering(+0.02);
+            }else if (gamepad1.rightBumperWasReleased()){
+                centering.setCentering(-0.02);
+            }
 
+            
 
+            if (gamepad1.leftBumperWasPressed()) {
+                hood.setAngle(+5);
+            }else if (gamepad1.leftBumperWasReleased()) {
+                hood.setAngle(-5);
+            }
 
-
-
+            if (gamepad1.aWasPressed()) {
+                indexerAll.runIndexerAll();
+            }else if (gamepad1.aWasReleased()) {
+                indexerAll.runIndexerAll();
+            }
         }
-
     }
 }

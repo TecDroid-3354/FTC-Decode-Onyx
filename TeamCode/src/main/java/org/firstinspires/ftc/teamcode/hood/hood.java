@@ -11,14 +11,15 @@ public class hood extends SubsystemBase {
 
     public hood (HardwareMap hardwareMap) {
         servoHood = new ServoEx(hardwareMap, "servoHood");
-        servoHood.getServo().scaleRange(0.3, 1.0);
+        servoHood.getServo().scaleRange(0, 360);
     }
 
     public void setAngle (double angle){
         servoHood.getServo().setPosition(angle);
     }
+    private double incrementServoHood;
 
-
-
-
+    public void setIncrementServoHood() {
+        setAngle(+10);
+    }
 }
