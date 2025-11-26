@@ -1,41 +1,56 @@
 package org.firstinspires.ftc.teamcode.IndexerAll;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.Centering.Centering;
+import org.firstinspires.ftc.teamcode.Hood.Hood;
 import org.firstinspires.ftc.teamcode.Indexer.Indexer;
 import org.firstinspires.ftc.teamcode.Indexer.Indexer;
 
 public class IndexerAll{
 
 
-    private GamepadEx gamepad1;
     private Indexer indexer;
+    private Hood hood;
+    private Centering centering;
 
-    public void initialize() {
-        indexer = new Indexer();
-        gamepad1 = new GamepadEx (new Gamepad());
+    public void initialize(HardwareMap hardwareMap) {
+        indexer = new Indexer(hardwareMap);
+        hood = new Hood (hardwareMap);
+        centering = new Centering (hardwareMap);
     }
 
-    public void runIndexerAll(){
-        initialize();
-        //wait for the game to start (driver presses PLAY)
-
-
-        //run until the end of the match(driver presses STOP)
-
-
-        if (gamepad1.getButton(GamepadKeys.Button.A)) {
-            indexer.setLeftIndexerServo (+5);
-            indexer.setRightIndexerServo(+5);
-            indexer.setStartIndexerServo(+5);
-            indexer.setIndexerMotor(1);
-        }else {
-            indexer.setLeftIndexerServo (0);
-            indexer.setRightIndexerServo(0);
-            indexer.setStartIndexerServo(0);
-            indexer.setIndexerMotor(0);
-        }
+    public void hoodPlus() {
+        hood.setIncrementServoHood();
+    }
+    public void hoodMinus() {
+        hood.decrementServoHood();
+    }
+    public void centeringPlus() {
+        centering.incrementCentering();
+    }
+    public void centeringMinus() {
+        centering.decrementCentering();
+    }
+    public void startIndexerPlus(){
+        indexer.incrementStartIndexer();
+    }
+    public void rightIndexerPlus(){
+        indexer.incrementRightIndexer();
+    }
+    public void leftIndexerPlus(){
+        indexer.incrementLeftIndexer();
+    }
+    public void startIndexerMinus(){
+        indexer.decrementStartIndexer();
+    }
+    public void rightIndexerMinus(){
+        indexer.decrementRightIndexer();
+    }
+    public void leftIndexerMinus(){
+        indexer.decrementLeftIndexer();
     }
 }

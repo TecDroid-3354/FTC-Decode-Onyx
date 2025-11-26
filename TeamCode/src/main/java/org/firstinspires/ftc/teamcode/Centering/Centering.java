@@ -18,8 +18,14 @@ public class Centering{
 public void setCentering(double angle){
         centeringLeft.set(-angle);
         centeringRight.set(angle);
+    }
+private double incrementCentering;
+
+public void incrementCentering() {
+    setCentering (+10);
 }
-
-
+public void decrementCentering() {
+    setCentering (-10);
+}
 
 }

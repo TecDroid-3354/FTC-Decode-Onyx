@@ -12,7 +12,7 @@ public class Indexer extends SubsystemBase {
     private ServoEx rightIndexerServo;
     private Motor indexerMotor;
 
-    private void initialize (HardwareMap hardwareMap) {
+    public Indexer (HardwareMap hardwareMap) {
         startIndexerServo = new ServoEx (hardwareMap, "indexerServo");
         startIndexerServo.getServo().scaleRange(0, 360);
 
@@ -34,26 +34,33 @@ public class Indexer extends SubsystemBase {
     }
 
     public void setLeftIndexerServo(double angle) {
-        leftIndexerServo.set(angle);
+        leftIndexerServo.set(-angle);
     }
 
     public void setIndexerMotor (double power) {
         indexerMotor.set(power);
     }
-
-    private double incrementRightIndexerServo;
+    private double incrementStartIndexerServo;
+    private double incrementRightInderxerServo;
     private double incrementLeftIndexerServo;
-    private double incrementIndexerServo;
-
-    public void setIncrementRightIndexerServo () {
+    public void incrementStartIndexer () {
+        setStartIndexerServo(+10);
+    }
+    public void incrementRightIndexer () {
         setRightIndexerServo(+10);
     }
-
-    public void setIncrementLeftIndexerServo () {
+    public void incrementLeftIndexer() {
         setLeftIndexerServo(+10);
     }
-    public void setIncrementIndexerServo () {
-        setStartIndexerServo(+10);
+
+    public void decrementStartIndexer() {
+        setStartIndexerServo(-10);
+    }
+    public void decrementRightIndexer() {
+        setRightIndexerServo(-10);
+    }
+    public void decrementLeftIndexer() {
+        setLeftIndexerServo(-10);
     }
 }
 

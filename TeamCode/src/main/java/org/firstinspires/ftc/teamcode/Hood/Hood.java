@@ -14,11 +14,14 @@ public class Hood extends SubsystemBase {
     }
 
     public void setAngle (double angle){
-        servoHood.getServo().setPosition(angle);
+        servoHood.getServo().setPosition(-angle);
     }
     private double incrementServoHood;
 
     public void setIncrementServoHood() {
         setAngle(+10);
+    }
+    public void decrementServoHood() {
+        setAngle(-10);
     }
 }
