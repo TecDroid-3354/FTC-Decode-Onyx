@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Shooter.Shooter;
 
 
-@TeleOp(name ="shooter",group ="Tec droid")
+@TeleOp(name ="OpMode",group ="Tec droid")
 public class OpMode extends CommandOpMode {
     private GamepadEx controller;
     private Shooter shooter;
