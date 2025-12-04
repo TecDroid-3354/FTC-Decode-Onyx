@@ -34,6 +34,12 @@ public class Indexer extends SubsystemBase {
         motor.setPower(1.0);
     }
 
+    public void swallow() {
+        upServo.setPower(1.0);
+        downServo.setPower(-1.0);
+        motor.setPower(1.0);
+    }
+
     public void disable() {
         upServo.setPower(0.0);
         downServo.setPower(0.0);

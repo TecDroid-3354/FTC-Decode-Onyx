@@ -15,6 +15,7 @@ public class Hood extends SubsystemBase {
     public Hood (HardwareMap hardwareMap) {
         servo = hardwareMap.get(Servo.class, Ids.hoodServoId);
         servo.setDirection(Servo.Direction.REVERSE);
+        setAngle(Physics.minLimit);
     }
 
     public void setAngle (double angle){
@@ -24,5 +25,9 @@ public class Hood extends SubsystemBase {
 
     public Command setAngleCMD (double angle) {
         return new InstantCommand(() -> setAngle(angle));
+    }
+
+    public Double getPosition() {
+        return servo.getPosition();
     }
 }

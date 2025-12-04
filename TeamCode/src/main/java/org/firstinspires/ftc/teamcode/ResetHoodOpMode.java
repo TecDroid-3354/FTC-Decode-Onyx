@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -48,7 +50,9 @@ public class ResetHoodOpMode extends CommandOpMode {
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart();
 
-        hood.setAngle(HoodConstants.Physics.maxLimit);
+        while (!isStopRequested() && opModeIsActive()) {
+            hood.setAngle(HoodConstants.Physics.maxLimit);
+        }
 
         // Cancels all previous commands
         reset();

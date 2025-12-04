@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
+import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
@@ -83,8 +84,16 @@ public class CMDOpMode extends CommandOpMode {
                 ));
 
         new GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed( shooter.shootCMD())
+                .whenPressed(new InstantCommand(
+                        () -> { intake.enable(); indexer.swallow(); }
+                ))
                 .whenReleased(new InstantCommand(
+                        () -> { intake.disable(); indexer.disable(); }
+                ));
+
+        new Trigger(() -> controller.gamepad.right_trigger > 0.0)
+                .whenActive( shooter.shootCMD())
+                .whenInactive(new InstantCommand(
                         () -> shooter.stop()
                 ));
 
@@ -97,7 +106,14 @@ public class CMDOpMode extends CommandOpMode {
     }
 
     public void periodic() {
+        if (controller.gamepad.dpad_up) {
+            hood.setAngle(hood.getPosition() + 0.01);
+        } else if (controller.gamepad.dpad_down) {
+            hood.setAngle(hood.getPosition() - 0.01);
+        }
+
         telemetry.addData("robot heading", getHeading(AngleUnit.DEGREES));
+        telemetry.addData("hood position", hood.getPosition());
     }
 
     // Main code body
