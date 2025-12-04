@@ -6,18 +6,22 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.commands.AlignToAprilTagCMD;
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Hood.Hood;
 import org.firstinspires.ftc.teamcode.subsystems.Indexer.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.Intake.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.Mecanum;
+import org.firstinspires.ftc.teamcode.vision.Limelight;
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -38,7 +42,12 @@ public class CMDOpMode extends CommandOpMode {
     private Shooter shooter;
     private Hood hood;
     private IMU imu;
+    private Limelight limelight;
     private GamepadEx controller;
+    private int[] limelightIdFilter;
+
+
+    private AlignToAprilTagCMD alignToAprilTagCMD;
 
     @Override
     public void initialize() {
@@ -51,6 +60,13 @@ public class CMDOpMode extends CommandOpMode {
         );
 
         imu.initialize(new IMU.Parameters(revHubOrientation));
+
+        limelight = new Limelight(
+                hardwareMap,
+                telemetry,
+                () -> getHeading(AngleUnit.DEGREES));
+
+        limelight.start();
 
         // Initializing the mecanum & its default command
         mecanum = new Mecanum(hardwareMap, telemetry);
@@ -65,8 +81,9 @@ public class CMDOpMode extends CommandOpMode {
         intake = new Intake(hardwareMap);
         indexer = new Indexer(hardwareMap);
         shooter = new Shooter(hardwareMap, telemetry);
-        hood = new Hood(hardwareMap);
+        hood = new Hood(hardwareMap, () -> limelight.getClassifierDistanceCm(limelightIdFilter));
 
+        alignToAprilTagCMD = new AlignToAprilTagCMD(mecanum, () -> limelight.getClassifierTx(limelightIdFilter));
         configureButtonBindings();
     }
     public void configureButtonBindings() {
@@ -103,6 +120,24 @@ public class CMDOpMode extends CommandOpMode {
         new GamepadButton(controller, GamepadKeys.Button.A)
                 .whenPressed( hood.setAngleCMD(0.25));
 
+        // Shoot sequence
+        new GamepadButton(controller, GamepadKeys.Button.X)
+                .whenPressed(
+                        new SequentialCommandGroup(
+                                hood.adjustAngleAccordingDistance(),
+                                shooter.shootCMD(),
+                                alignToAprilTagCMD.withTimeout(2000),
+                                indexer.enableCMD(),
+                                new WaitCommand(500),
+                                new InstantCommand(() -> shooter.stop()),
+                                new InstantCommand(() -> indexer.disable())
+                        )
+                );
+
+    }
+
+    public Double getHeading(AngleUnit angleUnit) {
+        return imu.getRobotYawPitchRollAngles().getYaw(angleUnit);
     }
 
     public void periodic() {
@@ -125,7 +160,7 @@ public class CMDOpMode extends CommandOpMode {
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart();
 
-        //limelight.getMotifPattern()
+        selectAlliance();
 
         // Run the scheduler
         while (!isStopRequested() && opModeIsActive()) {
@@ -141,7 +176,46 @@ public class CMDOpMode extends CommandOpMode {
         reset();
     }
 
-    public Double getHeading(AngleUnit angleUnit) {
-        return imu.getRobotYawPitchRollAngles().getYaw(angleUnit);
+    public void selectAlliance() {
+        // select side
+        String[] options = {"BlueAlliance", "RedAlliance", "Test"};
+        int index = 0;
+
+        while (!isStarted() && !isStopRequested()) {
+
+            if (gamepad1.dpad_down) {
+                index = (index - 1 + options.length) % options.length;
+            }
+            if (gamepad1.dpad_up) {
+                index = (index + 1) % options.length;
+            }
+
+            telemetry.addLine("Select the Alliance:");
+            for (int i = 0; i < options.length; i++) {
+                if (i == index) {
+                    telemetry.addLine(" ➤ " + options[i]);
+                } else {
+                    telemetry.addLine("   " + options[i]);
+                }
+            }
+            telemetry.update();
+
+            sleep(200);
+        }
+
+        switch (options[index]) {
+            case "BlueAlliance":
+                limelightIdFilter = new int[]{20};
+                break;
+
+            case "RedAlliance":
+                limelightIdFilter = new int[]{24};
+                break;
+
+            default:
+                limelightIdFilter = new int[]{20, 24};
+                break;
+        }
+
     }
 }

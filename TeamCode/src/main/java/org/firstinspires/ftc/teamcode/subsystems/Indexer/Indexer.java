@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.Indexer.IndexerConstants.Ids;
@@ -32,6 +34,10 @@ public class Indexer extends SubsystemBase {
         upServo.setPower(1.0);
         downServo.setPower(1.0);
         motor.setPower(1.0);
+    }
+
+    public Command enableCMD() {
+        return new InstantCommand(this::enable);
     }
 
     public void swallow() {

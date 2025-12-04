@@ -13,12 +13,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.utils.Angle
 import org.firstinspires.ftc.teamcode.utils.Distance
+import java.util.function.DoubleSupplier
 import kotlin.math.tan
 
 class Limelight(
     hardwareMap: HardwareMap,
     val telemetry: Telemetry,
-    var otos: SparkFunOTOS
+    val heading: DoubleSupplier
 ) : SubsystemBase() {
 
     private var limelight: Limelight3A? = null
@@ -39,10 +40,6 @@ class Limelight(
         limelight!!.pipelineSwitch(VisionConstants.LimelightConfiguration.PipelineIndex) // Gets the limelight pipeline
         limelight!!.setPollRateHz(VisionConstants.LimelightConfiguration.PollRateHz)
 
-        otos = hardwareMap.get<SparkFunOTOS?>(SparkFunOTOS::class.java, "otos")
-        otos.setAngularUnit(AngleUnit.DEGREES)
-        otos.setLinearUnit(DistanceUnit.INCH)
-        otos.resetTracking()
     }
 
     fun start() {
@@ -72,25 +69,7 @@ class Limelight(
         return 0.0
     }
 
-    fun getClassifierDistance(filterArray: IntArray): Distance {
-
-        if (llResult!!.isValid && llResult != null) {
-            val fiducialResult = llResult!!.fiducialResults
-
-            for (detectedId in fiducialResult) {
-                for (id in filterArray) {
-                    if (detectedId.fiducialId == id) {
-                        return distanceFromLimelightToGoalInches
-                    }
-                }
-            }
-        }
-
-        return Distance.fromInches(0.0)
-    }
-
     private fun getObeliskId() {
-
         if (llResult!!.isValid && llResult != null) {
             val fiducialResult = llResult!!.fiducialResults
 
@@ -106,22 +85,34 @@ class Limelight(
         }
     }
 
+    fun getClassifierDistanceCm(filterArray: IntArray): Double {
+
+        if (llResult!!.isValid && llResult != null) {
+            val fiducialResult = llResult!!.fiducialResults
+
+            for (detectedId in fiducialResult) {
+                for (id in filterArray) {
+                    if (detectedId.fiducialId == id) {
+                        return distanceFromLimelightToGoalInches.cm
+                    }
+                }
+            }
+        }
+
+        return 0.0
+    }
+
     override fun periodic() {
-        telemetry.addData("orientationOTOS", otos.getPosition().h)
-        //telemetry.addData("Motif", getMotifPattern().pattern.toString())
-
-        //telemetry.addData("Id detected", getObeliskId())
-
         // Updating limelights' robot orientation with the Yaw
-        limelight!!.updateRobotOrientation(otos.getPosition().h)
+        limelight!!.updateRobotOrientation(heading.asDouble)
 
         // LLResult is like a container full of information about what Limelight sees
         llResult = limelight!!.getLatestResult()
 
+
         getObeliskId()
-        // Math to calculate distance was taken from documentation:
-        // https://docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-estimating-distance#using-area-to-estimate-distance
-        // The condition verifies whether the LimeLight Result is a valid statement
+        telemetry.addData("Id detected", getObeliskId())
+
         if (llResult != null && llResult!!.isValid()) {
 
             // Offset to target in degrees (from crosshair)
@@ -133,7 +124,7 @@ class Limelight(
             // Calculated distance from limelight lens to goal (in inches)
             distanceFromLimelightToGoalInches =
                 (AprilTagsPhysicalDescription.GoalHeightFromGround - LimelightPhysicalDescription.LLHeightFromGroundToLens) / tan(angleToGoalRadians)
-            //telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches.inches)
+            telemetry.addData("TargetDistanceCM", distanceFromLimelightToGoalInches.cm)
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
             tx = llResult!!.getTx()
@@ -152,8 +143,8 @@ class Limelight(
             telemetry.addData("Ta", ta) // Represents how big the AprilTag looks
 
             // according to the camera field of view (0-100%)
-            telemetry.addData("BotPose", botPose.toString())
-            telemetry.addData("Yaw", botPose.getOrientation().getYaw())
+            //telemetry.addData("BotPose", botPose.toString())
+            //telemetry.addData("Yaw", botPose.getOrientation().getYaw())
 
             /*
              * It is important to notice that the Full3D option should be enabled
@@ -163,13 +154,5 @@ class Limelight(
             ty = 0.0
             ta = 0.0
         }
-    } /*
-     * ESTIMATING DISTANCE
-     *
-     *   1. Place the robot at a fixed, measured distance from the AprilTag
-     *   2. Get the how big the AprilTag looks from the camera field of view, i.e. the Ta param
-     *   3. Get a curve / regression out of all values
-     *   4. Work backwards and from the curve, get the distance to the current point
-     *
-     * */
+    }
 }
