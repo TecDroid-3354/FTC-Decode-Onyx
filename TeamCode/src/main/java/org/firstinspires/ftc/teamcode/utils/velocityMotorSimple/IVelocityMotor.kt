@@ -1,0 +1,48 @@
+package org.firstinspires.ftc.teamcode.utils.velocityMotorSimple
+
+import Angle
+import AngularVelocity
+import Distance
+import LinearVelocity
+import com.seattlesolvers.solverslib.hardware.motors.Motor
+
+data class VelocityMotorConfig(
+    val zeroPowerBehavior: Motor.ZeroPowerBehavior = Motor.ZeroPowerBehavior.FLOAT,
+    val direction: Motor.Direction = Motor.Direction.FORWARD,
+    val ticksPerRevolution: Double = 1.0,
+    val svaCoefficients: SVACoefficients = SVACoefficients(0.2, 0.5, 0.0),
+    var gearRatio: Double = 1.0,
+    val powerThreshold: Double = 0.01
+)
+
+data class SVACoefficients(
+    val kS: Double,
+    val kV: Double,
+    val kA: Double
+)
+
+interface IVelocityMotor {
+    /* ! CONFIG METHODS ! */
+    var config: VelocityMotorConfig
+    fun applyConfig()
+    fun applyConfig(config: VelocityMotorConfig)
+
+    /* ! FUNCTIONAL METHODS ! */
+    fun setPower(power: Double)
+    fun setVelocity(angularVelocity: AngularVelocity)
+    fun setVelocity(linearVelocity: LinearVelocity)
+    fun setVelocity(linearVelocity: LinearVelocity, circumference: Distance)
+    fun stopMotor()
+
+    /* ! SETTER METHODS !*/
+    fun setGearRatio(gearRatio: Double)
+    fun setDirection(direction: Motor.Direction)
+    fun setCircumference(circumference: Distance)
+    fun setMode(mode: Motor.RunMode)
+
+    /* ! GETTER METHODS ! */
+    fun getPosition(): Angle
+    fun getVelocity(): AngularVelocity
+    fun getLinearVelocity(): LinearVelocity
+    fun getLinearVelocity(circumference: Distance): LinearVelocity
+}
