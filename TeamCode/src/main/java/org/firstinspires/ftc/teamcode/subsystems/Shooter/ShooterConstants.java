@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public class ShooterConstants {
     public static class Ids {
-        public static final String shooterMotorId = "shooterMotors";
+        public static final String shooterMotorId = "shooterMotor";
 
     }
 

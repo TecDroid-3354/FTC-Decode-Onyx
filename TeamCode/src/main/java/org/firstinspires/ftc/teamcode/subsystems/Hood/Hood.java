@@ -1,18 +1,28 @@
 package org.firstinspires.ftc.teamcode.subsystems.Hood;
 
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
+import androidx.core.math.MathUtils;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
+import org.firstinspires.ftc.teamcode.subsystems.Hood.HoodConstants.*;
 public class Hood extends SubsystemBase {
-    private ServoEx servo;
+    private Servo servo;
 
 
     public Hood (HardwareMap hardwareMap) {
-        servo = hardwareMap.get(ServoEx.class, HoodConstants.Ids.hoodServoId);
+        servo = hardwareMap.get(Servo.class, Ids.hoodServoId);
+        servo.setDirection(Servo.Direction.REVERSE);
     }
 
     public void setAngle (double angle){
-        servo.set(angle);
+        double clampedAngle = MathUtils.clamp(angle, Physics.minLimit, Physics.maxLimit);
+        servo.setPosition(clampedAngle);
+    }
+
+    public Command setAngleCMD (double angle) {
+        return new InstantCommand(() -> setAngle(angle));
     }
 }

@@ -12,6 +12,9 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd;
+import org.firstinspires.ftc.teamcode.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Hood.Hood;
+import org.firstinspires.ftc.teamcode.subsystems.Indexer.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.Intake.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.Mecanum;
 
@@ -30,6 +33,9 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.Mecanum;
 public class CMDOpMode extends CommandOpMode {
     private Mecanum mecanum;
     private Intake intake;
+    private Indexer indexer;
+    private Shooter shooter;
+    private Hood hood;
     private IMU imu;
     private GamepadEx controller;
 
@@ -56,6 +62,9 @@ public class CMDOpMode extends CommandOpMode {
         ));
 
         intake = new Intake(hardwareMap);
+        indexer = new Indexer(hardwareMap);
+        shooter = new Shooter(hardwareMap, telemetry);
+        hood = new Hood(hardwareMap);
 
         configureButtonBindings();
     }
@@ -64,16 +73,31 @@ public class CMDOpMode extends CommandOpMode {
                 .whenPressed(new InstantCommand(
                         () -> imu.resetYaw()
                 ));
+
+        new GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(new InstantCommand(
+                        () -> { intake.enable(); indexer.enable(); }
+                ))
+                .whenReleased(new InstantCommand(
+                        () -> { intake.disable(); indexer.disable(); }
+                ));
+
+        new GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed( shooter.shootCMD())
+                .whenReleased(new InstantCommand(
+                        () -> shooter.stop()
+                ));
+
+        new GamepadButton(controller, GamepadKeys.Button.Y)
+                .whenPressed( hood.setAngleCMD(1.0));
+
+        new GamepadButton(controller, GamepadKeys.Button.A)
+                .whenPressed( hood.setAngleCMD(0.25));
+
     }
 
     public void periodic() {
         telemetry.addData("robot heading", getHeading(AngleUnit.DEGREES));
-
-        if (controller.gamepad.a) {
-            intake.enable();
-        } else {
-            intake.disable();
-        }
     }
 
     // Main code body
