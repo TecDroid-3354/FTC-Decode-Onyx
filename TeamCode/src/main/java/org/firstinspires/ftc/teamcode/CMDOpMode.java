@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Hood.Hood;
 import org.firstinspires.ftc.teamcode.subsystems.Indexer.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.Intake.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.Mecanum;
+import org.firstinspires.ftc.teamcode.utils.Distance;
 import org.firstinspires.ftc.teamcode.vision.Limelight;
 
 
@@ -85,7 +86,7 @@ public class CMDOpMode extends CommandOpMode {
         indexer = new Indexer(hardwareMap);
         flicker = new Flicker(hardwareMap);
         shooter = new Shooter(hardwareMap, telemetry);
-        hood = new Hood(hardwareMap, () -> limelight.getClassifierDistanceCm(limelightIdFilter));
+        hood = new Hood(hardwareMap, limelight, () -> limelightIdFilter);
 
         alignToAprilTagCMD = new AlignToAprilTagCMD(mecanum, () -> limelight.getClassifierTx(limelightIdFilter));
         configureButtonBindings();
@@ -111,7 +112,6 @@ public class CMDOpMode extends CommandOpMode {
         new Trigger(() -> controller.gamepad.right_trigger > 0.1)
                 .whileActiveContinuous(
                         new SequentialCommandGroup(
-                                //hood.adjustAngleAccordingDistance(),
                                 shooter.shootCMD(),
                                 indexer.enableCMD(),
                                 new WaitCommand(1400),
@@ -141,7 +141,11 @@ public class CMDOpMode extends CommandOpMode {
             hood.setAngle(hood.getPosition() - 0.01);
         }
 
-        telemetry.addData("robot heading", getHeading(AngleUnit.DEGREES));
+        if (controller.gamepad.x) {
+            hood.adjustAngleAccordingDistance().schedule();
+        }
+
+        //telemetry.addData("robot heading", getHeading(AngleUnit.DEGREES));
         telemetry.addData("hood position", hood.getPosition());
     }
 

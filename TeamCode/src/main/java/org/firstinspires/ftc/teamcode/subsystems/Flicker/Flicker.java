@@ -10,11 +10,6 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 
-import org.firstinspires.ftc.teamcode.subsystems.Hood.HoodConstants;
-
-import java.util.Random;
-import java.util.function.DoubleSupplier;
-
 public class Flicker extends SubsystemBase {
     private Servo servo;
 

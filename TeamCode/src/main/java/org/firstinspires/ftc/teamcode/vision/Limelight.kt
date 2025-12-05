@@ -81,20 +81,20 @@ class Limelight(
         }
     }
 
-    fun getClassifierDistanceCm(filterArray: IntArray): Double {
+    fun getClassifierDistance(filterArray: IntArray): Distance {
         if (llResult != null && llResult!!.isValid) {
             val fiducialResult = llResult!!.fiducialResults
 
             for (detectedId in fiducialResult) {
                 for (id in filterArray) {
                     if (detectedId.fiducialId == id) {
-                        return distanceFromLimelightToGoalInches.cm
+                        return distanceFromLimelightToGoalInches
                     }
                 }
             }
         }
 
-        return 0.0
+        return Distance.fromInches(0.0)
     }
 
     override fun periodic() {
@@ -119,7 +119,7 @@ class Limelight(
             // Calculated distance from limelight lens to goal (in inches)
             distanceFromLimelightToGoalInches =
                 (AprilTagsPhysicalDescription.GoalHeightFromGround - LimelightPhysicalDescription.LLHeightFromGroundToLens) / tan(angleToGoalRadians)
-            telemetry.addData("TargetDistanceCM", distanceFromLimelightToGoalInches.cm)
+            telemetry.addData("TargetDistanceMeters", distanceFromLimelightToGoalInches.meters)
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
             tx = llResult!!.getTx()
