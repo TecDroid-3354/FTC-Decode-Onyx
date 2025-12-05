@@ -108,7 +108,7 @@ public class CMDOpMode extends CommandOpMode {
                         () -> { intake.disable(); indexer.disable(); }
                 ));
 
-        new Trigger(() -> controller.gamepad.right_trigger > 0.0)
+        new Trigger(() -> controller.gamepad.right_trigger > 0.1)
                 .whenActive( shooter.shootCMD())
                 .whenInactive(new InstantCommand(
                         () -> shooter.stop()
