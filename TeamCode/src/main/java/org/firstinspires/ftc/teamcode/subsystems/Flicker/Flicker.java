@@ -6,7 +6,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.subsystems.Hood.HoodConstants;
 
@@ -18,15 +20,31 @@ public class Flicker extends SubsystemBase {
 
 
     public Flicker (HardwareMap hardwareMap) {
-        servo = hardwareMap.get(Servo.class, "flickerServo");
+        servo = hardwareMap.get(Servo.class, FlickerConstants.Ids.flickerServoId);
 
-        servo.setDirection(Servo.Direction.REVERSE);
+        servo.setDirection(FlickerConstants.MotorConfig.motorDirection);
         setAngle(0.0);
     }
 
     public void setAngle(double angle) {
-        double clampedAngle = MathUtils.clamp(angle, 0.0, 1.0);
+        double clampedAngle = MathUtils.clamp(angle, FlickerConstants.Physics.minLimit, FlickerConstants.Physics.maxLimit);
         servo.setPosition(clampedAngle);
+    }
+
+    public void raise() {
+        servo.setPosition(FlickerConstants.Physics.maxLimit);
+    }
+
+    public void lower() {
+        servo.setPosition(FlickerConstants.Physics.minLimit);
+    }
+
+    public Command shootSequence() {
+        return new SequentialCommandGroup(
+                new InstantCommand(this::raise),
+                new WaitCommand(300),
+                new InstantCommand(this::lower)
+        );
     }
 
     public Command setAngleCMD(double angle) {

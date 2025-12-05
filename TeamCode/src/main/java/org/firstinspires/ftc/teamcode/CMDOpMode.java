@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.commands.AlignToAprilTagCMD;
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Flicker.Flicker;
 import org.firstinspires.ftc.teamcode.subsystems.Hood.Hood;
 import org.firstinspires.ftc.teamcode.subsystems.Indexer.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.Intake.Intake;
@@ -39,12 +41,13 @@ public class CMDOpMode extends CommandOpMode {
     private Mecanum mecanum;
     private Intake intake;
     private Indexer indexer;
+    private Flicker flicker;
     private Shooter shooter;
     private Hood hood;
     private IMU imu;
     private Limelight limelight;
     private GamepadEx controller;
-    private int[] limelightIdFilter;
+    private int[] limelightIdFilter = new int[]{20, 24};
 
 
     private AlignToAprilTagCMD alignToAprilTagCMD;
@@ -80,6 +83,7 @@ public class CMDOpMode extends CommandOpMode {
 
         intake = new Intake(hardwareMap);
         indexer = new Indexer(hardwareMap);
+        flicker = new Flicker(hardwareMap);
         shooter = new Shooter(hardwareMap, telemetry);
         hood = new Hood(hardwareMap, () -> limelight.getClassifierDistanceCm(limelightIdFilter));
 
@@ -100,39 +104,29 @@ public class CMDOpMode extends CommandOpMode {
                         () -> { intake.disable(); indexer.disable(); }
                 ));
 
-        new GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(
-                        () -> { intake.enable(); indexer.swallow(); }
-                ))
-                .whenReleased(new InstantCommand(
-                        () -> { intake.disable(); indexer.disable(); }
-                ));
-
-        new Trigger(() -> controller.gamepad.right_trigger > 0.1)
-                .whenActive( shooter.shootCMD())
-                .whenInactive(new InstantCommand(
-                        () -> shooter.stop()
-                ));
-
         new GamepadButton(controller, GamepadKeys.Button.Y)
-                .whenPressed( hood.setAngleCMD(1.0));
-
-        new GamepadButton(controller, GamepadKeys.Button.A)
-                .whenPressed( hood.setAngleCMD(0.25));
+                .whenPressed(flicker.shootSequence());
 
         // Shoot sequence
-        new GamepadButton(controller, GamepadKeys.Button.X)
-                .whenPressed(
+        new Trigger(() -> controller.gamepad.right_trigger > 0.1)
+                .whileActiveContinuous(
                         new SequentialCommandGroup(
-                                hood.adjustAngleAccordingDistance(),
+                                //hood.adjustAngleAccordingDistance(),
                                 shooter.shootCMD(),
-                                alignToAprilTagCMD.withTimeout(2000),
                                 indexer.enableCMD(),
-                                new WaitCommand(500),
+                                new WaitCommand(1400),
+                                flicker.shootSequence()
+                        )
+                )
+                .whenInactive(
+                        new SequentialCommandGroup(
                                 new InstantCommand(() -> shooter.stop()),
                                 new InstantCommand(() -> indexer.disable())
                         )
                 );
+
+        new Trigger(() -> controller.gamepad.right_trigger > 0.1)
+                .whileActiveContinuous(alignToAprilTagCMD);
 
     }
 
@@ -157,10 +151,10 @@ public class CMDOpMode extends CommandOpMode {
         // Code executed at the very beginning, right after hitting the INIT Button
         initialize();
 
+        selectAlliance();
+
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart();
-
-        selectAlliance();
 
         // Run the scheduler
         while (!isStopRequested() && opModeIsActive()) {

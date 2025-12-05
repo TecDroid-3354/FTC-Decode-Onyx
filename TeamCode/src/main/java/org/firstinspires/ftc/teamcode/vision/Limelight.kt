@@ -1,16 +1,12 @@
 package org.firstinspires.ftc.teamcode.vision
 
 import com.qualcomm.hardware.limelightvision.LLResult
-import com.qualcomm.hardware.limelightvision.LLResultTypes
 import com.qualcomm.hardware.limelightvision.Limelight3A
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.vision.VisionConstants.LimelightPhysicalDescription
 import org.firstinspires.ftc.teamcode.vision.VisionConstants.AprilTagsPhysicalDescription
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.utils.Angle
 import org.firstinspires.ftc.teamcode.utils.Distance
 import java.util.function.DoubleSupplier
@@ -54,7 +50,7 @@ class Limelight(
 
     fun getClassifierTx(filterArray: IntArray): Double {
 
-        if (llResult!!.isValid && llResult != null) {
+        if (llResult != null && llResult!!.isValid) {
             val fiducialResult = llResult!!.fiducialResults
 
             for (detectedId in fiducialResult) {
@@ -70,7 +66,7 @@ class Limelight(
     }
 
     private fun getObeliskId() {
-        if (llResult!!.isValid && llResult != null) {
+        if (llResult != null && llResult!!.isValid) {
             val fiducialResult = llResult!!.fiducialResults
 
             outerLoop@ for (detectedId in fiducialResult) {
@@ -86,8 +82,7 @@ class Limelight(
     }
 
     fun getClassifierDistanceCm(filterArray: IntArray): Double {
-
-        if (llResult!!.isValid && llResult != null) {
+        if (llResult != null && llResult!!.isValid) {
             val fiducialResult = llResult!!.fiducialResults
 
             for (detectedId in fiducialResult) {
@@ -131,24 +126,10 @@ class Limelight(
             ty = llResult!!.getTy()
             ta = llResult!!.getTa()
 
-            val botPose = llResult!!.getBotpose_MT2()
             telemetry.addData(
                 "Tx",
                 tx
-            ) // Represents how far left/right the target is (in degrees)
-            telemetry.addData(
-                "Ty",
-                ty
-            ) // Represents how far up/down the target is (in degrees)
-            telemetry.addData("Ta", ta) // Represents how big the AprilTag looks
-
-            // according to the camera field of view (0-100%)
-            //telemetry.addData("BotPose", botPose.toString())
-            //telemetry.addData("Yaw", botPose.getOrientation().getYaw())
-
-            /*
-             * It is important to notice that the Full3D option should be enabled
-             * */
+            )
         } else {
             tx = 0.0
             ty = 0.0

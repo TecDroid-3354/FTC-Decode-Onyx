@@ -71,6 +71,11 @@ class Mecanum(
         backRightMotor = Motor(hardwareMap, Ids.backRightId, Physics.countPerRevolution, Physics.maxRPM)
         backLeftMotor = Motor(hardwareMap, Ids.backLeftId, Physics.countPerRevolution, Physics.maxRPM)
 
+        frontLeftMotor.setInverted(false)
+        frontRightMotor.setInverted(false)
+        backLeftMotor.setInverted(true)
+        backRightMotor.setInverted(true)
+
         frontRightMotor.setRunMode(Motor.RunMode.RawPower)
         frontLeftMotor.setRunMode(Motor.RunMode.RawPower)
         backRightMotor.setRunMode(Motor.RunMode.RawPower)

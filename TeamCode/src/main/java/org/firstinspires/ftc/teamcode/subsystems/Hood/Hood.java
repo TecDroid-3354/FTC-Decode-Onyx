@@ -17,15 +17,6 @@ public class Hood extends SubsystemBase {
     private Servo servo;
     private DoubleSupplier aprilTagDistance;
 
-
-    public Hood(HardwareMap hardwareMap) {
-        servo = hardwareMap.get(Servo.class, Ids.hoodServoId);
-        this.aprilTagDistance = aprilTagDistance;
-
-        servo.setDirection(Servo.Direction.REVERSE);
-        setAngle(Physics.minLimit);
-    }
-
     public Hood(HardwareMap hardwareMap, DoubleSupplier aprilTagDistance) {
         servo = hardwareMap.get(Servo.class, Ids.hoodServoId);
         this.aprilTagDistance = aprilTagDistance;

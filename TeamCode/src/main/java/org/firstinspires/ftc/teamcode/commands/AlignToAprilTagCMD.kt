@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.Mecanum
 import java.util.function.DoubleSupplier
 
 class AlignToAprilTagCMD(val mecanum: Mecanum, val tx: DoubleSupplier) : CommandBase() {
-    val pidController = PIDController(1.0, 0.0, 0.0)
+    val pidController = PIDController(0.04, 0.0, 0.0)
 
     init {
         addRequirements(mecanum)
@@ -18,7 +18,7 @@ class AlignToAprilTagCMD(val mecanum: Mecanum, val tx: DoubleSupplier) : Command
     }
 
     override fun execute() {
-        val rx = pidController.calculate(tx.asDouble, 0.0)
+        val rx = -pidController.calculate(tx.asDouble, 0.0)
         mecanum.setChassisSpeeds(ChassisSpeeds(0.0, 0.0, rx))
     }
 

@@ -38,7 +38,7 @@ public class ResetHoodOpMode extends CommandOpMode {
 
     @Override
     public void initialize() {
-        hood = new Hood(hardwareMap);
+        hood = new Hood(hardwareMap, () -> 0.0);
     }
 
     // Main code body
