@@ -213,14 +213,14 @@ public class RudimentaryBlueAuto extends CommandOpMode {
 
             // Set Target FIRST, then turn on RUN_TO_POSITION
             frontLeftMotor.setTargetPosition(leftTarget);
-            backLeftMotor.setTargetPosition(leftTarget);
+            //backLeftMotor.setTargetPosition(leftTarget);
             frontRightMotor.setTargetPosition(rightTarget);
-            backRightMotor.setTargetPosition(rightTarget);
+            //backRightMotor.setTargetPosition(rightTarget);
 
             frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Set the required driving speed  (must be positive for RUN_TO_POSITION)
             // Start driving straight, and then enter the control loop
@@ -229,7 +229,7 @@ public class RudimentaryBlueAuto extends CommandOpMode {
 
             // keep looping while we are still active, and BOTH motors are running.
             while (opModeIsActive() &&
-                   (frontLeftMotor.isBusy() && frontRightMotor.isBusy() && backLeftMotor.isBusy() && backRightMotor.isBusy())) {
+                   (frontLeftMotor.isBusy() && frontRightMotor.isBusy())) {
 
                 // Determine required steering to keep on heading
                 turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
@@ -239,7 +239,7 @@ public class RudimentaryBlueAuto extends CommandOpMode {
                     turnSpeed *= -1.0;
 
                 // Apply the turning correction to the current driving speed.
-                moveRobot(driveSpeed, turnSpeed);
+                moveRobot(driveSpeed, 0.0);
 
                 // Display drive status for the driver.
                 sendTelemetry(true);
