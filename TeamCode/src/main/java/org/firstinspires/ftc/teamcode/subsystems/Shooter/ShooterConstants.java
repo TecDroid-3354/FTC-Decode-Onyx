@@ -13,7 +13,7 @@ public class ShooterConstants {
 
     @Configurable
     public static class PIDF {
-        public static final PIDFCoefficients pidfCoefficients = new PIDFCoefficients(2.0, 0.0, 0.0, 15.0);
+        public static final PIDFCoefficients pidfCoefficients = new PIDFCoefficients(4.0, 0.0, 0.0, 20.0);
     }
 
     public static class MotorConfig {

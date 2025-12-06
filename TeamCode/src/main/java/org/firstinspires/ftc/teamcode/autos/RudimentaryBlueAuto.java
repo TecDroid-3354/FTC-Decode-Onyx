@@ -9,15 +9,26 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.CommandScheduler;
+import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
+import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Flicker.Flicker;
+import org.firstinspires.ftc.teamcode.subsystems.Hood.Hood;
+import org.firstinspires.ftc.teamcode.subsystems.Indexer.Indexer;
+import org.firstinspires.ftc.teamcode.subsystems.Intake.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants;
+import org.firstinspires.ftc.teamcode.vision.Limelight;
 
 @Autonomous(name="RudimentaryBlueAuto", group="Robot")
-@Disabled
-public class RudimentaryBlueAuto extends LinearOpMode {
+public class RudimentaryBlueAuto extends CommandOpMode {
 
     /* Declare OpMode members. */
     private DcMotor frontRightMotor;
@@ -25,6 +36,14 @@ public class RudimentaryBlueAuto extends LinearOpMode {
     private DcMotor backRightMotor;
     private DcMotor backLeftMotor;
     private IMU             imu         = null;      // Control/Expansion Hub IMU
+
+    private Intake intake;
+    private Indexer indexer;
+    private Flicker flicker;
+    private Shooter shooter;
+    private Hood hood;
+    private Limelight limelight;
+    private Boolean readyToShoot = true;
 
     private double          headingError  = 0;
 
@@ -49,26 +68,15 @@ public class RudimentaryBlueAuto extends LinearOpMode {
     static final double     TURN_SPEED              = 0.4;     // Max turn speed to limit turn rate.
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
                                                                // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
-    // Define the Proportional control coefficient (or GAIN) for "heading control".
-    // We define one value when Turning (larger errors), and the other is used when Driving straight (smaller errors).
-    // Increase these numbers if the heading does not correct strongly enough (eg: a heavy robot or using tracks)
-    // Decrease these numbers if the heading does not settle on the correct value (eg: very agile robot with omni wheels)
     static final double     P_TURN_GAIN            = 0.02;     // Larger is more responsive, but also less stable.
     static final double     P_DRIVE_GAIN           = 0.03;     // Larger is more responsive, but also less stable.
 
-
     @Override
-    public void runOpMode() {
-
+    public void initialize() {
         frontRightMotor = hardwareMap.get(DcMotor.class, MecanumConstants.Ids.frontRightId);
         frontLeftMotor = hardwareMap.get(DcMotor.class, MecanumConstants.Ids.frontLeftId);
         backRightMotor = hardwareMap.get(DcMotor.class, MecanumConstants.Ids.backRightId);
         backLeftMotor = hardwareMap.get(DcMotor.class, MecanumConstants.Ids.backLeftId);
-
-        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
-        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         imu = hardwareMap.get(IMU.class, "imu");
 
@@ -78,6 +86,55 @@ public class RudimentaryBlueAuto extends LinearOpMode {
         );
 
         imu.initialize(new IMU.Parameters(revHubOrientation));
+
+        limelight = new Limelight(
+                hardwareMap,
+                telemetry,
+                () -> getHeading());
+
+        limelight.start();
+
+        intake = new Intake(hardwareMap);
+        indexer = new Indexer(hardwareMap);
+        flicker = new Flicker(hardwareMap);
+        shooter = new Shooter(hardwareMap, telemetry);
+        hood = new Hood(hardwareMap, limelight, () -> new int[]{20, 24});
+
+        new Trigger(() -> readyToShoot)
+                .whileActiveContinuous(
+                        new SequentialCommandGroup(
+                                shooter.shootCMD(),
+                                new WaitCommand(2000),
+                                indexer.enableCMD(),
+                                new WaitCommand(500),
+                                flicker.shootSequence(),
+                                new WaitCommand(500),
+                                new InstantCommand(() -> intake.enable()),
+                                new WaitCommand(800),
+                                flicker.shootSequence(),
+                                new InstantCommand(() -> readyToShoot = false)
+                        )
+                ).whenInactive(
+                        new SequentialCommandGroup(
+                                new WaitCommand(1000),
+                                new InstantCommand(() -> shooter.stop()),
+                                new InstantCommand(() -> indexer.disable()),
+                                new InstantCommand(() -> intake.disable())
+                        )
+                );
+    }
+
+    @Override
+    public void runOpMode() {
+        // Code executed at the very beginning, right after hitting the INIT Button
+        initialize();
+        // Pauses OpMode until the START button is pressed on the Driver Hub
+        waitForStart();
+
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -108,14 +165,25 @@ public class RudimentaryBlueAuto extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
-        driveStraight(DRIVE_SPEED, 48.0, 0.0);    // Drive Forward 24"
-        turnToHeading( TURN_SPEED, -45.0);               // Turn  CW to -45 Degrees
-        holdHeading( TURN_SPEED, -45.0, 0.5);   // Hold -45 Deg heading for a 1/2 second
-
+        driveStraight(DRIVE_SPEED, -48.0, 0.0);
+        //turnToHeading( TURN_SPEED, 0.0);               // Turn  CW to -45 Degrees
+        //holdHeading( TURN_SPEED, 0.0, 0.5);   // Hold -45 Deg heading for a 1/2 second
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
         sleep(1000);  // Pause to display last telemetry message.
+
+        // Run the scheduler
+        while (!isStopRequested() && opModeIsActive()) {
+
+            // Command for actually running the scheduler
+            CommandScheduler.getInstance().run();
+
+            telemetry.update();
+        }
+
+        // Cancels all previous commands
+        reset();
     }
 
     /**
@@ -179,6 +247,7 @@ public class RudimentaryBlueAuto extends LinearOpMode {
 
             // Stop all motion & Turn off RUN_TO_POSITION
             moveRobot(0, 0);
+            readyToShoot = true;
 
             frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

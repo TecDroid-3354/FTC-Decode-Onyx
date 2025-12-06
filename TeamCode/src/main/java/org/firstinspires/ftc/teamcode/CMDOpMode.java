@@ -108,13 +108,16 @@ public class CMDOpMode extends CommandOpMode {
         new GamepadButton(controller, GamepadKeys.Button.Y)
                 .whenPressed(flicker.shootSequence());
 
+        new GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed(shooter.shootCMD())
+                .whenReleased(new InstantCommand(() -> shooter.stop()));
+
         // Shoot sequence
         new Trigger(() -> controller.gamepad.right_trigger > 0.1)
                 .whileActiveContinuous(
                         new SequentialCommandGroup(
-                                shooter.shootCMD(),
                                 indexer.enableCMD(),
-                                new WaitCommand(1400),
+                                new WaitCommand(800),
                                 flicker.shootSequence()
                         )
                 )
@@ -155,7 +158,7 @@ public class CMDOpMode extends CommandOpMode {
         // Code executed at the very beginning, right after hitting the INIT Button
         initialize();
 
-        selectAlliance();
+        //selectAlliance();
 
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart();
